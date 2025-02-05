@@ -1,0 +1,8 @@
+#Pastas Completas
+
+node_modules
+.vscode
+
+#Arquivos
+
+.env
