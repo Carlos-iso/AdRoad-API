@@ -118,7 +118,7 @@ exports.authenticate = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        roles: user.roles
+        roles: user.roles,
         dataAcount: user.createDate,
         dataToken: Date.now()
       },
