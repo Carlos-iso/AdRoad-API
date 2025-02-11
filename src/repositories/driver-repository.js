@@ -31,6 +31,11 @@ exports.authenticate = async (data) => {
   return isValidPassword ? user : null;
 };
 
+exports.getWithById = async (data) => {
+  const user = await Driver.findOne({ id: data._id });
+  return user;
+};
+
 exports.update = async (id, data) => {
   await Driver.findByIdAndUpdate(id, {
     $set: {

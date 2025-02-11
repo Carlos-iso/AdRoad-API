@@ -110,7 +110,6 @@ exports.authenticate = async (req, res, next) => {
       email: user.email,
       roles: user.roles
     });
-
     res.status(201).send({
       message: "Login Bem Sucedido!",
       token: token,
@@ -133,45 +132,36 @@ exports.refreshToken = async (req, res, next) => {
     const token =
       req.body.token || req.query.token || req.headers["x-access-token"];
     const data = await authService.decodeToken(token);
-
-    const user = await repository.authenticate({
-      email: req.body.email,
-      password: req.body.password
+    const user = await repository.getWithById({
+      id: req.body.id
     });
-
     if (!user) {
       res.status(404).send({
-        message: "Token Não Encontrado!",
-      });
+        message: "Usuário Não Encontrado!"
+      })
       return;
-    }
-    const isValidPassword = await bcryptjs.compare(req.body.password, user.password);
-    if (!isValidPassword) {
-      res.status(404).send({ message: "Usuário Ou Senha Inválido" });
-      return;
-    }
-
-    const tokenData = await authService.generateToken({
+    };
+      const tokenData = await authService.generateToken({
       id: user._id,
       name: user.name,
       email: user.email,
       roles: user.roles
     });
-
     res.status(201).send({
+      message: "Login Atualizado Com Sucesso",
       token: token,
       data: {
         email: user.email,
         name: user.name,
-      },
+        date: user.createDate
+      }
     });
   } catch (e) {
     res.status(500).send({
       message: "Falha No Token!",
     });
   }
-};
-
+  
 exports.put = async (req, res, next) => {
   try {
     await repository.update(req.params.id, req.body);
