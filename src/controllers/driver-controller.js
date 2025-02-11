@@ -131,36 +131,41 @@ exports.refreshToken = async (req, res, next) => {
   try {
     const token =
       req.body.token || req.query.token || req.headers["x-access-token"];
-    const data = await authService.decodeToken(token);
-    const user = await repository.getWithById({
-      id: req.body.id
-    });
+      const data = await authService.decodeToken(token);
+      const user = await repository.getWithById({
+        id: req.body.id
+      });
+
     if (!user) {
       res.status(404).send({
         message: "Usuário Não Encontrado!"
-      })
+      });
       return;
-    };
-      const tokenData = await authService.generateToken({
+    }
+
+    const tokenData = await authService.generateToken({
       id: user._id,
       name: user.name,
       email: user.email,
       roles: user.roles
     });
+
     res.status(201).send({
       message: "Login Atualizado Com Sucesso",
-      token: token,
+      token: tokenData, // Aqui estava retornando o token antigo, alterei para tokenData
       data: {
         email: user.email,
         name: user.name,
         date: user.createDate
       }
     });
-  } catch (e) {
+
+  } catch (e) { // O catch precisa estar no mesmo nível do try
     res.status(500).send({
       message: "Falha No Token!",
     });
   }
+};
   
 exports.put = async (req, res, next) => {
   try {
