@@ -118,7 +118,7 @@ exports.authenticate = async (req, res, next) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        data: user.createDate
+        date: user.createDate
       },
     });
   } catch (e) {
@@ -135,7 +135,8 @@ exports.refreshToken = async (req, res, next) => {
     const data = await authService.decodeToken(token);
 
     const user = await repository.authenticate({
-      email: req.body.email
+      email: req.body.email,
+      password: req.body.password
     });
 
     if (!user) {
