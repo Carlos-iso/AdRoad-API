@@ -3,6 +3,7 @@
 const ValidationContract = require("../validators/fluent-validator.js");
 const repository = require("../repositories/driver-repository.js");
 const authService = require("../services/auth-service.js");
+const errorHandler = require("../services/error-handler.js");
 const bcryptjs = require("bcryptjs");
 
 exports.get = async (req, res, next) => {
@@ -136,7 +137,12 @@ exports.refreshToken = async (req, res, next) => {
     try {
         const token =
             req.body.token || req.query.token || req.headers["x-access-token"];
-        const data = await authService.decodeToken(token);
+        try {
+            const data = await authService.decodeToken(token);
+            console.log(data);
+        } catch (err) {
+            ("Atualizando…");
+        }
         const user = await repository.getById(req.body.id);
         if (!user) {
             res.status(404).send({
