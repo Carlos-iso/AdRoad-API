@@ -25,12 +25,12 @@ const schema = new Schema({
         enum: ['user', 'admin'],
         default: 'user'
     }],
-    createDate: {
+    createdAt: {
         type: Date,
         required: [true, 'A Data É Necessário'],
         default: Date.now
     },
-    balance_driver: {
+    balanceDriver: {
       type: Number,
       decimal: true,
       require: true,
