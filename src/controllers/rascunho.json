@@ -1,0 +1,9 @@
+{
+  "_id": "ID anuncio nativo do mongodb",
+  "enterprise": "Campos do shema advertiser",
+  "titleAd": "Titulo anuncio",
+  "descriptionAd": "Descrição anuncio",
+  "originsAd": ["Arrey com links dos itens anexados: Videos, Imagens, etc"],
+  "adCreatedAtAd": "Data de criação do anuncio",
+  "isActived": true
+}

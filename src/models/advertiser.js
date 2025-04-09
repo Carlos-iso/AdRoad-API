@@ -25,15 +25,31 @@ const schema = new Schema({
         required: [true, 'A Senha É Necessário'],
         unique: false
     },
-    createDate: {
+    createdAt: {
         type: Date,
         required: [true, 'A Data É Necessário'],
         default: Date.now
     },
-    balance_ad: {
+    adress: {
+    street: { type: String, required: true, trim: true, required: [true, "Necessário Informar Rua"] },
+    number: { type: String, required: true, default: "S/N" },
+    complement: { type: String, trim: true },
+    neighborhood: { type: String, required: true, trim: true },
+    city: { type: String, required: [true, "Necessário Informar Cidade"], trim: true },
+    state: {
+      type: String,
+      trim: true,
+      required: [true, "Necessário Informar Estado"],
+    },
+    postalCode: {
+      type: String,
+      required: [true, "Necessário Informar CEP"],
+      match: [/^\d{5}-?\d{3}$/, "CEP inválido"],
+    },
+  },
+    balance: {
       type: Number,
       decimal: true,
-      require: true,
       default: 0
     }
 });

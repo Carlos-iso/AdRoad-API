@@ -26,7 +26,6 @@ exports.getById = async (req, res, next) => {
             message: "Falha Ao Buscar ID"
         });
     }
-};
 
 exports.post = async (req, res, next) => {
     let contract = new ValidationContract();
