@@ -1,15 +1,10 @@
 "use strict";
-
 const mongoose = require("mongoose");
-const { isLowercase } = require("validator");
 const Schema = mongoose.Schema;
-// const validator = require('mongoose-validator');
-
 const schema = new Schema({
   name_enterprise: {
     type: String,
     required: [true, "O Nome É Necessário"],
-    unique: false,
   },
   email: {
     type: String,
@@ -26,28 +21,32 @@ const schema = new Schema({
     required: [true, "A Senha É Necessário"],
     unique: false,
   },
+  adress: {
+    street: {
+      type: String,
+      trim: true,
+    },
+    number: { type: String },
+    complement: { type: String, trim: true },
+    neighborhood: { type: String, trim: true },
+    city: {
+      type: String,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    postalCode: {
+      type: String,
+      match: [/^\d{5}-?\d{3}$/, "CEP inválido"],
+    },
+  },
   balance_ad: {
     type: Number,
     decimal: true,
     required: true,
     default: 0,
-  },
-  adress: {
-    street: { type: String, required: true, trim: true, required: [true, "Necessário Informar Rua"] },
-    number: { type: String, required: true, default: "S/N" },
-    complement: { type: String, trim: true },
-    neighborhood: { type: String, required: true, trim: true },
-    city: { type: String, required: [true, "Necessário Informar Cidade"], trim: true },
-    state: {
-      type: String,
-      trim: true,
-      required: [true, "Necessário Informar Estado"],
-    },
-    postalCode: {
-      type: String,
-      required: [true, "Necessário Informar CEP"],
-      match: [/^\d{5}-?\d{3}$/, "CEP inválido"],
-    },
   },
   createdAt: {
     type: Date,
@@ -55,5 +54,4 @@ const schema = new Schema({
     default: Date.now,
   },
 });
-
 module.exports = mongoose.model("Advertiser", schema);
