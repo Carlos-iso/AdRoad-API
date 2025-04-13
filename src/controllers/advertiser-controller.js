@@ -1,8 +1,8 @@
 "use strict";
 const ValidationContract = require("../validators/fluent-validator.js");
 const repository = require("../repositories/advertiser-repository.js");
-const md5 = require("md5");
 const authService = require("../services/auth-service.js");
+const bcryptjs = require("bcryptjs");
 exports.get = async (req, res, next) => {
   try {
     var data = await repository.get();
@@ -51,10 +51,12 @@ exports.post = async (req, res, next) => {
       });
       return;
     }
+    const salt = bcryptjs.genSaltSync(10);
+    const hash = await bcryptjs.hash(req.body.password, salt);
     await repository.create({
       name_enterprise: req.body.name_enterprise,
       email: req.body.email,
-      password: md5(`${req.body.password}-${req.body.cnpj}`),
+      password: hash,
       cnpj: req.body.cnpj,
     });
     res.status(201).send({
@@ -70,48 +72,47 @@ exports.post = async (req, res, next) => {
 exports.authenticate = async (req, res, next) => {
   let contract = new ValidationContract();
   contract.isEmail(req.body.email, "E-mail Inválido");
+  contract.isValidCnpj(req.body.cnpj, "CNPJ Inválido");
   contract.hasMinLen(
     req.body.password,
     8,
     "A Senha Deve Conter Pelo Manos 8 Caracteres"
   );
-
   //Se os dados forem inválidos
   if (!contract.isValid()) {
     res.status(422).send(contract.errors()).end();
     return;
   }
-
   try {
     const enterprise = await repository.authenticate({
       email: req.body.email,
-      password: md5(`${req.body.password}-${global.SALT_KEY}`),
+      cnpj: req.body.cnpj,
+      password: req.body.password
     });
-
     if (!enterprise) {
       res.status(404).send({
         message: "Usuário Ou Senha Inválido",
       });
       return;
     }
-
     const token = await authService.generateToken({
       id: enterprise._id,
-      email: enterprise.email,
       name_enterprise: enterprise.name_enterprise,
+      email: enterprise.email,
       cnpj: enterprise.cnpj,
+      createdAt: enterprise.createdAt
     });
-
+    console.log(enterprise)
     res.status(201).send({
       message: "Login Bem Sucedido!",
       token: token,
-      data: {
-        _id: enterprise._id,
-        email: enterprise.email,
+      dataAdvertiser: {
+        id: enterprise._id,
         name_enterprise: enterprise.name_enterprise,
+        email: enterprise.email,
         cnpj: enterprise.cnpj,
-        data: enterprise.createDate,
-      },
+        createdAt: enterprise.createdAt,
+      }
     });
   } catch (e) {
     res.status(500).send({
@@ -119,15 +120,12 @@ exports.authenticate = async (req, res, next) => {
     });
   }
 };
-
 exports.refreshToken = async (req, res, next) => {
   try {
     const token =
       req.body.token || req.query.token || req.headers["x-access-token"];
     const data = await authService.decodeToken(token);
-
     const enterprise = await repository.getById(data.id);
-
     if (!enterprise) {
       res.status(404).send({
         message: "Token Não Encontrado!",
@@ -141,7 +139,6 @@ exports.refreshToken = async (req, res, next) => {
       name_enterprise: enterprise.name_enterprise,
       cnpj: enterprise.cnpj,
     });
-
     res.status(201).send({
       token: token,
       data: {

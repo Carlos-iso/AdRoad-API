@@ -1,6 +1,7 @@
 "use strict";
 const mongoose = require("mongoose");
 const Advertiser = mongoose.model("Advertiser");
+const bcryptjs = require("bcryptjs");
 exports.get = async () => {
   const res = await Advertiser.find(
     {},
@@ -25,11 +26,16 @@ exports.create = async (data) => {
   await advertiser.save();
 };
 exports.authenticate = async (data) => {
-  const res = await Advertiser.findOne({
+  const advertiser = await Advertiser.findOne({
     email: data.email,
-    password: data.password,
+    cnpj: data.cnpj
   });
-  return res;
+  if (!advertiser) return "Usuário Não Encontrado";
+    const isValidPassword = await bcryptjs.compare(
+        data.password,
+        advertiser.password
+    );
+    return isValidPassword ? advertiser : "Senha Inválida";
 };
 exports.update = async (id, data) => {
   await Advertiser.findByIdAndUpdate(id, {
@@ -43,3 +49,4 @@ exports.update = async (id, data) => {
 exports.delete = async (id) => {
   await Advertiser.findByIdAndRemove(id);
 };
+  

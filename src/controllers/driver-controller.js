@@ -2,7 +2,6 @@
 const ValidationContract = require("../validators/fluent-validator.js");
 const repository = require("../repositories/driver-repository.js");
 const authService = require("../services/auth-service.js");
-const errorHandler = require("../services/error-handler.js");
 const bcryptjs = require("bcryptjs");
 exports.get = async (req, res, next) => {
   try {

@@ -42,7 +42,7 @@ const schema = new Schema({
       match: [/^\d{5}-?\d{3}$/, "CEP inválido"],
     },
   },
-  balance_ad: {
+  balanceAdvertiser: {
     type: Number,
     decimal: true,
     required: true,
