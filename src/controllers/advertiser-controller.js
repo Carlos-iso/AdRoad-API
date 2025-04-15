@@ -1,6 +1,7 @@
 "use strict";
 const ValidationContract = require("../validators/fluent-validator.js");
 const repository = require("../repositories/advertiser-repository.js");
+const allRepository = require("../repositories/all-repository.js");
 const authService = require("../services/auth-service.js");
 const bcryptjs = require("bcryptjs");
 exports.get = async (req, res, next) => {
@@ -44,12 +45,21 @@ exports.post = async (req, res, next) => {
   }
   try {
     //Se o usuário já existir
+    //Dentro
     const existingUser = await repository.getByAdvertiserExist(req.body.email, req.body.cnpj);
     if (existingUser !== null) {
       res.status(409).send({
         message: "Email e/ou CNPJ em uso",
       });
       return;
+    }
+    // Fora
+    const allExist = await allRepository.checkAllExist(req.body.email)
+    if (allExist.exists) {
+      return res.status(409).send({
+        success: false,
+        message: `Este email já está cadastrado como ${allExist.type}` 
+      });
     }
     const salt = bcryptjs.genSaltSync(10);
     const hash = await bcryptjs.hash(req.body.password, salt);
