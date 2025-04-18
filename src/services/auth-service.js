@@ -1,21 +1,17 @@
 "use strict";
-
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 const errorHandler = require("./error-handler.js");
-
 exports.generateToken = async data => {
     const token = jwt.sign(data, jwtSecret, { expiresIn: "15m" });
-    const issuedAt = Date.now();
-    return { token, issuedAt };
+    const expiresAt = Date.now();
+    return { token, expiresAt };
 };
-
 exports.decodeToken = async token => {
     var data = await jwt.verify(token, jwtSecret);
     console.log("aqui")
     return data;
 };
-
 exports.authorize = function (req, res, next) {
     var token =
         req.body.token || req.query.token || req.headers["x-access-token"];
@@ -35,7 +31,6 @@ exports.authorize = function (req, res, next) {
         });
     }
 };
-
 exports.refreshTokenMiddleware = function (req, res, next) {
     var token =
         req.body.token || req.query.token || req.headers["x-access-token"];
